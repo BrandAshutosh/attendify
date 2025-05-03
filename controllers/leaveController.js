@@ -1,5 +1,5 @@
 const LeaveModel = require('../models/attendanceModel');
-const LeaveBalanceModel = require('../models/leaveBalanceModel');
+const LeaveBalanceModel = require('../models/leavebalanceModel');
 const UserModel = require('../models/userModel');
 const OnDutyModel = require('../models/ondutyModel');
 const Exception = require('../models/exceptionModel');
