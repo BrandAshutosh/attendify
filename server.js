@@ -4,6 +4,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const http = require('http');
+const cron = require('node-cron'); 
+
+const { processMonthlyLeave } = require('./controllers/leaveController');
+
 
 const globalRoutes = require('./routes/globalRoutes');
 
@@ -41,6 +45,11 @@ app.use((err, req, res, next) => {
         status: err.status,
         message: err.message
     });
+});
+
+cron.schedule('0 0 1 * *', () => {
+    console.log('Running The Monthly Leave Update Process ...');
+    processMonthlyLeave();
 });
 
 server.listen(process.env.PORT || 3000, () => {
