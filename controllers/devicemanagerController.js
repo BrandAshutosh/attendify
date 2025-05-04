@@ -127,7 +127,7 @@ exports.getDeviceManagerByUserId = async (req, res) => {
             filter.clientId = clientId;
         }
 
-        const device = await DeviceManager.findOne(filter);
+        const device = await DeviceManager.find(filter);
 
         if (!device) {
             return res.send({
