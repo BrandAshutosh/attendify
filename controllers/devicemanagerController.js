@@ -82,10 +82,10 @@ exports.getDeviceManagerById = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
     const clientId = userData.memberData.clientId;
-    const deviceId = parseInt(req.params.id);
+    const id = parseInt(req.params.id);
 
     try {
-        let filter = { _id: deviceId };
+        let filter = { _id: id };
 
         if (clientId !== parseInt(process.env.MASTER_CLIENT_ID)) {
             filter.clientId = clientId;
@@ -108,6 +108,40 @@ exports.getDeviceManagerById = async (req, res) => {
 
     } catch (error) {
         await logException(error.message, 'getDeviceManagerById', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
+exports.getDeviceManagerByUserId = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+    const userId = parseInt(req.params.userId);
+
+    try {
+        let filter = { userId: userId };
+
+        if (clientId !== parseInt(process.env.MASTER_CLIENT_ID)) {
+            filter.clientId = clientId;
+        }
+
+        const device = await DeviceManager.findOne(filter);
+
+        if (!device) {
+            return res.send({
+                status: false,
+                message: "No Device Record Found"
+            });
+        }
+
+        return res.send({
+            data: device,
+            message: "Device Record Fetched Successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'getDeviceManagerByUserId', clientIp, clientId);
         res.status(500).json({ status: false, error: error.message });
     }
 };

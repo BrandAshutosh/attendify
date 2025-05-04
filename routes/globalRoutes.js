@@ -69,6 +69,7 @@ router.post('/exportHoliday', verifyToken, HolidayController.exportHoliday);
 router.post('/createDeviceManager', verifyToken, DeviceManagerController.createDeviceManager);
 router.post('/getDeviceManagers', verifyToken, DeviceManagerController.getDeviceManagers);
 router.post('/getDeviceManagerById', verifyToken, DeviceManagerController.getDeviceManagerById);
+router.post('/getDeviceManagerByUserId', verifyToken, DeviceManagerController.getDeviceManagerByUserId);
 router.post('/deleteDeviceManager', verifyToken, DeviceManagerController.deleteDeviceManager);
 router.post('/exportDeviceManager', verifyToken, DeviceManagerController.exportDeviceManager);
 
