@@ -25,21 +25,18 @@ exports.createDeviceManager = async (req, res) => {
     const clientId = userData.memberData.clientId;
 
     try {
-        const query = {
+        const newDevice = {
             ...req.body,
-            clientId: clientId
-        };
-
-        const update = {
-            ...req.body,
-            creatorIp: clientIp,
             clientId: clientId,
+            creatorIp: clientIp,
             createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
         };
 
+        const savedDevice = await DeviceManager.create(newDevice);
+
         return res.send({
             data: savedDevice,
-            message: "Device Record Created or Updated Successfully",
+            message: "Device Record Created Successfully",
             status: true
         });
 
@@ -48,7 +45,6 @@ exports.createDeviceManager = async (req, res) => {
         res.status(500).json({ status: false, error: error.message });
     }
 };
-
 
 exports.getDeviceManagers = async (req, res) => {
     const userData = req.user;
