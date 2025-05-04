@@ -18,23 +18,32 @@ const logException = async (message, methodName, ipAddress, clientId) => {
     }
 };
 
+
 exports.createDeviceManager = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
     const clientId = userData.memberData.clientId;
 
     try {
-        const savedDevice = new DeviceManager({
+        const query = {
+            ...req.body,
+            clientId: clientId
+        };
+
+        const update = {
             ...req.body,
             creatorIp: clientIp,
             clientId: clientId,
             createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
-        });
+        };
 
-        await savedDevice.save();
+        const options = { new: true, upsert: true }; 
+
+        const savedDevice = await DeviceManager.findOneAndUpdate(query, update, options);
+
         return res.send({
             data: savedDevice,
-            message: "Device Record Created Successfully",
+            message: "Device Record Created or Updated Successfully",
             status: true
         });
 
@@ -43,6 +52,7 @@ exports.createDeviceManager = async (req, res) => {
         res.status(500).json({ status: false, error: error.message });
     }
 };
+
 
 exports.getDeviceManagers = async (req, res) => {
     const userData = req.user;
@@ -82,7 +92,7 @@ exports.getDeviceManagerById = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
     const clientId = userData.memberData.clientId;
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.query.id);
 
     try {
         let filter = { _id: id };
@@ -116,7 +126,7 @@ exports.getDeviceManagerByUserId = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
     const clientId = userData.memberData.clientId;
-    const userId = parseInt(req.params.userId);
+    const userId = parseInt(req.query.userId);
 
     try {
         let filter = { userId: userId };
