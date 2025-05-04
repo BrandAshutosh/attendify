@@ -8,6 +8,7 @@ const holidaySchema = new mongoose.Schema(
         clientId: { type: Number },
         year: { type: String },
         date: { type: String },
+        holiday: { type: String },
         numberOfDays: { type: Number },
         createdBy: { type: String },
         updatedBy: { type: String },
