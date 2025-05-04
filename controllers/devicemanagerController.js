@@ -37,10 +37,6 @@ exports.createDeviceManager = async (req, res) => {
             createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
         };
 
-        const options = { new: true, upsert: true }; 
-
-        const savedDevice = await DeviceManager.findOneAndUpdate(query, update, options);
-
         return res.send({
             data: savedDevice,
             message: "Device Record Created or Updated Successfully",
