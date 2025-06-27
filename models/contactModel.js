@@ -10,6 +10,7 @@ const contactSchema = new mongoose.Schema(
         name: { type: String },
         email: { type: String },
         message: { type: String },
+        status:{type: Number},
         createdBy: { type: String },
         updatedBy: { type: String },
         creatorIp: { type: String },

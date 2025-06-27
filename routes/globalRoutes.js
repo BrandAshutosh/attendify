@@ -11,6 +11,7 @@ const AdvanceController = require('../controllers/advanceController.js');
 const HolidayController = require('../controllers/holidayController.js');
 const DeviceManagerController = require('../controllers/devicemanagerController.js');
 const ShiftController = require('../controllers/shiftController.js');
+const ContactController = require('../controllers/contactController.js');
 
 
 const router = express.Router();
@@ -82,5 +83,11 @@ router.post('/updateShift', verifyToken, ShiftController.updateShift);
 router.post('/deleteShift', verifyToken, ShiftController.deleteShift);
 router.post('/exportShifts', verifyToken, ShiftController.exportShifts);
 
+router.post('/createContact', verifyToken, ContactController.createContact);
+router.post('/getContacts', verifyToken, ContactController.getContacts);
+router.post('/getContactById', verifyToken, ContactController.getContactById);
+router.post('/updateContact', verifyToken, ContactController.updateContact);
+router.post('/deleteContact', verifyToken, ContactController.deleteContact);        
+router.post('/exportContacts', verifyToken, ContactController.exportContacts);
 
 module.exports = router;
