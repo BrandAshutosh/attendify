@@ -21,6 +21,7 @@ router.post('/startSystem', StartController.startSystemApi);
 router.post('/signup', AuthorizationController.signup);
 router.post('/login', AuthorizationController.login);
 router.post('/forgetPassword', AuthorizationController.forgetPassword);
+router.post("/changePassword", AuthorizationController.changePassword);
 
 router.post('/createException', verifyToken, ExceptionController.createException); 
 router.post('/getExceptions', verifyToken, ExceptionController.getExceptions);
