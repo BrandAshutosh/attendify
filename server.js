@@ -7,8 +7,6 @@ const http = require('http');
 const cron = require('node-cron'); 
 
 const { processMonthlyLeave } = require('./controllers/leaveController');
-
-
 const globalRoutes = require('./routes/globalRoutes');
 
 const app = express();

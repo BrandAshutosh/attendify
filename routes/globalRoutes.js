@@ -10,6 +10,8 @@ const LeaveController = require('../controllers/leaveController.js');
 const AdvanceController = require('../controllers/advanceController.js');
 const HolidayController = require('../controllers/holidayController.js');
 const DeviceManagerController = require('../controllers/devicemanagerController.js');
+const ShiftController = require('../controllers/shiftController.js');
+
 
 const router = express.Router();
 
@@ -72,5 +74,13 @@ router.post('/getDeviceManagerById', verifyToken, DeviceManagerController.getDev
 router.post('/getDeviceManagerByUserId', verifyToken, DeviceManagerController.getDeviceManagerByUserId);
 router.post('/deleteDeviceManager', verifyToken, DeviceManagerController.deleteDeviceManager);
 router.post('/exportDeviceManager', verifyToken, DeviceManagerController.exportDeviceManager);
+
+router.post('/createShift', verifyToken, ShiftController.createShift);
+router.post('/getShifts', verifyToken, ShiftController.getShifts);
+router.post('/getShiftById', verifyToken, ShiftController.getShiftById);
+router.post('/updateShift', verifyToken, ShiftController.updateShift);
+router.post('/deleteShift', verifyToken, ShiftController.deleteShift);
+router.post('/exportShifts', verifyToken, ShiftController.exportShifts);
+
 
 module.exports = router;
