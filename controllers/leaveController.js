@@ -1,4 +1,4 @@
-const LeaveModel = require('../models/attendanceModel');
+const LeaveModel = require('../models/leaveModel');
 const LeaveBalanceModel = require('../models/leavebalanceModel');
 const UserModel = require('../models/userModel');
 const OnDutyModel = require('../models/ondutyModel');
