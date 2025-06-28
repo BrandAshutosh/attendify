@@ -285,3 +285,52 @@ exports.exportUserlist = async (req, res) => {
         res.status(500).json({ status: false, error: error.message });
     }
 };
+
+exports.getManagers = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+    const userId = parseInt(req.query.userId);
+
+    try {
+    
+        let managerList = [];
+        let currentUser = await UserModel.findOne({ _id: userId, clientId: clientId });
+
+        if (!currentUser) {
+            return res.send({
+                data: [],
+                message: "No User Found with the given ID",
+                status: true
+            });
+        }
+
+        while (currentUser && currentUser.reportingToId) {
+            const reportingToUser = await UserModel.findOne({ _id: currentUser.reportingToId, clientId: clientId });
+            if (reportingToUser) {
+                managerList.unshift(reportingToUser); 
+                currentUser = reportingToUser;
+            } else {
+                break;
+            }
+        }
+
+        if (managerList.length === 0) {
+            return res.send({
+                data: [],
+                message: "No Manager Found in Hierarchy",
+                status: true
+            });
+        }
+
+        return res.send({
+            data: managerList,
+            message: "Managers Fetched Successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'getManagers', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};

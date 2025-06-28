@@ -35,6 +35,7 @@ router.post('/getUserById', verifyToken, UserController.getUserById);
 router.post('/updateUser', verifyToken, UserController.updateUser);
 router.post('/deleteUser', verifyToken, UserController.deleteUser);
 router.post('/exportUserlist', verifyToken, UserController.exportUserlist);
+router.post('/getManagers', verifyToken, UserController.getManagers);
 
 router.post('/createAttendance', verifyToken, AttendanceController.createAttendance);
 router.post('/getAttendances', verifyToken, AttendanceController.getAttendances);
