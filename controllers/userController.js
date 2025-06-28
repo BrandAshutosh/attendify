@@ -293,9 +293,9 @@ exports.getManagers = async (req, res) => {
     const userId = parseInt(req.query.userId);
 
     try {
-    
+
         let managerList = [];
-        let currentUser = await UserModel.findOne({ _id: userId, clientId: clientId });
+        let currentUser = await UserModel.findOne({ _id: userId, clientId });
 
         if (!currentUser) {
             return res.send({
@@ -305,27 +305,26 @@ exports.getManagers = async (req, res) => {
             });
         }
 
+        managerList.push(currentUser);
+      
         while (currentUser && currentUser.reportingToId) {
-            const reportingToUser = await UserModel.findOne({ _id: currentUser.reportingToId, clientId: clientId });
+            const reportingToUser = await UserModel.findOne({
+                _id: currentUser.reportingToId,
+                clientId
+            });
+
             if (reportingToUser) {
-                managerList.unshift(reportingToUser); 
+                managerList.push(reportingToUser);
+                if (reportingToUser._id === 1) break;
                 currentUser = reportingToUser;
             } else {
                 break;
             }
         }
 
-        if (managerList.length === 0) {
-            return res.send({
-                data: [],
-                message: "No Manager Found in Hierarchy",
-                status: true
-            });
-        }
-
         return res.send({
-            data: managerList,
-            message: "Managers Fetched Successfully",
+            data: managerList.reverse(),
+            message: "User & Managers Fetched Successfully",
             status: true
         });
 
