@@ -1,5 +1,6 @@
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken.js');
+const upload = require('../utils/uploadDocument.js');
 
 const StartController = require('../controllers/startController.js');
 const AuthorizationController = require('../controllers/authorizationController.js')
@@ -12,11 +13,15 @@ const HolidayController = require('../controllers/holidayController.js');
 const DeviceManagerController = require('../controllers/devicemanagerController.js');
 const ShiftController = require('../controllers/shiftController.js');
 const ContactController = require('../controllers/contactController.js');
+const DocumentController = require('../controllers/documentController');
 
 
 const router = express.Router();
 
+
 router.post('/startSystem', StartController.startSystemApi);
+
+router.post('/documentUpload', upload.single('document'), DocumentController.documentUpload);
 
 router.post('/signup', AuthorizationController.signup);
 router.post('/login', AuthorizationController.login);
