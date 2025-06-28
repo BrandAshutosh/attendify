@@ -398,6 +398,10 @@ exports.processMonthlyLeave = async (req, res) => {
                             casualLeave: 1,
                             sickLeave: 0.5,
                             earnedLeave: 1.5
+                        },
+                        $set: {
+                            updatedBy: 'System',
+                            updatorIp: 'AUTO'
                         }
                     }
                 );
@@ -415,9 +419,24 @@ exports.processMonthlyLeave = async (req, res) => {
                 });
             }
         }
+
         console.log('Monthly Leave Credits Processed Successfully');
+
+        if (res) {
+            return res.status(200).json({
+                status: true,
+                message: 'Monthly Leave Credits Processed Successfully'
+            });
+        }
     } catch (error) {
         console.error('Monthly leave credit error:', error.message);
+
+        if (res) {
+            return res.status(500).json({
+                status: false,
+                error: error.message
+            });
+        }
     }
 };
 
