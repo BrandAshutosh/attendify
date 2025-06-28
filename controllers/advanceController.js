@@ -92,11 +92,13 @@ exports.getAdvanceReports = async (req, res) => {
         const approvedCount = await AdvanceModel.countDocuments({ ...filter, isapproved: 1 });
         const unapprovedCount = await AdvanceModel.countDocuments({ ...filter, isunapproved: 1 });
         const appliedCount = await AdvanceModel.countDocuments({ ...filter, isapplied: 1 });
+        const paidCount = await AdvanceModel.countDocuments({ ...filter, ispaid: 1 });
 
         const report = [
             { approved: approvedCount },
             { unapproved: unapprovedCount },
-            { applied: appliedCount }
+            { applied: appliedCount },
+            { paid: paidCount }
         ];
 
         return res.send({

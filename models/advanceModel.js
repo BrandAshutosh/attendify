@@ -13,6 +13,7 @@ const advanceSchema = new mongoose.Schema(
         isapplied: { type: Boolean, default: false },
         isapproved: { type: Boolean, default: false },
         isunapproved: { type: Boolean, default: false },
+        ispaid: { type: Boolean, default: false },
         createdBy: { type: String },
         updatedBy: { type: String },
         creatorIp: { type: String },
