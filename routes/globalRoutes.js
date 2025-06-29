@@ -15,6 +15,7 @@ const DeviceManagerController = require('../controllers/devicemanagerController.
 const ShiftController = require('../controllers/shiftController.js');
 const ContactController = require('../controllers/contactController.js');
 const VehicleController = require('../controllers/vehicleController.js');
+const TripController = require('../controllers/tripController.js');
 
 
 
@@ -106,6 +107,12 @@ router.post('/getVehicleDetailsById', verifyToken, VehicleController.getVehicleD
 router.post('/updateVehicle', verifyToken, VehicleController.updateVehicle);
 router.post('/deleteVehicle', verifyToken, VehicleController.deleteVehicle);
 router.post('/exportVehicles', verifyToken, VehicleController.exportVehicles);
+
+router.post('/createTrip', verifyToken, TripController.createTrip);
+router.post('/getTrips', verifyToken, TripController.getTrips);
+router.post('/getTripById', verifyToken, TripController.getTripById);
+router.post('/updateTrip', verifyToken, TripController.updateTrip);
+router.post('/deleteTrip', verifyToken, TripController.deleteTrip);
 
 
 module.exports = router;
