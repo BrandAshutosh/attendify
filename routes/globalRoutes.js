@@ -1,6 +1,6 @@
 const express = require('express');
 const verifyToken = require('../middlewares/verifyToken.js');
-const upload = require('../utils/uploadDocument.js');
+const { upload } = require('../utils/uploadDocument.js');
 
 const StartController = require('../controllers/startController.js');
 const AuthorizationController = require('../controllers/authorizationController.js')

@@ -1,40 +1,20 @@
-const path = require('path');
-const fs = require('fs');
-
-const uploadDir = path.join(__dirname, '..', 'uploads', 'documents');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+const { uploadFileToDrive } = require('../utils/uploadDocument');
 
 exports.documentUpload = async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({
-                status: false,
-                message: "No file uploaded"
-            });
-        }
 
-        const domain = req.protocol + '://' + req.get('host');
-        const relativePath = `/uploads/documents/${req.file.filename}`;
-        const fullPath = domain + relativePath;
+        const driveUrl = await uploadFileToDrive(req.file.path, req.file.originalname);
 
-        return res.send({
+        res.send({
             status: true,
-            message: "Document uploaded successfully",
+            message: "Uploaded Successfully",
             data: {
-                filename: req.file.filename,
                 originalname: req.file.originalname,
-                mimetype: req.file.mimetype,
                 size: req.file.size,
-                path: relativePath,
-                fullPath: fullPath 
+                url: driveUrl
             }
         });
     } catch (error) {
-        res.status(500).json({
-            status: false,
-            error: error.message
-        });
+        res.status(500).json({ status: false, message: "Failed To Upload", error: error.message });
     }
 };
