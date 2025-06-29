@@ -22,22 +22,43 @@ exports.createVehicle = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
     const clientId = userData.memberData.clientId;
+    const userId = userData.memberData._id;
 
     try {
-        const savedVehicle = new VehicleModel({
-            ...req.body,
-            creatorIp: clientIp,
-            clientId: clientId,
-            userId: userData.memberData._id,
-            createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
-        });
+        const existingVehicle = await VehicleModel.findOne({ userId, clientId });
 
-        await savedVehicle.save();
-        return res.send({
-            data: savedVehicle,
-            message: "Vehicle Created Successfully",
-            status: true
-        });
+        if (existingVehicle) {
+            existingVehicle.set({
+                ...req.body,
+                updatedBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
+                updatorIp: clientIp
+            });
+
+            await existingVehicle.save();
+
+            return res.send({
+                data: existingVehicle,
+                message: "Vehicle Updated Successfully",
+                status: true
+            });
+
+        } else {
+            const newVehicle = new VehicleModel({
+                ...req.body,
+                creatorIp: clientIp,
+                clientId: clientId,
+                userId: userId,
+                createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
+            });
+
+            await newVehicle.save();
+
+            return res.send({
+                data: newVehicle,
+                message: "Vehicle Created Successfully",
+                status: true
+            });
+        }
 
     } catch (error) {
         await logException(error.message, 'createVehicle', clientIp, clientId);
@@ -75,6 +96,35 @@ exports.getVehicles = async (req, res) => {
 
     } catch (error) {
         await logException(error.message, 'getVehicles', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
+exports.getVehicleByUserId = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+    const userId = parseInt(req.query.userId);
+
+    try {
+        const vehicle = await VehicleModel.findOne({ clientId: clientId, userId: userId });
+
+        if (!vehicle) {
+            return res.send({
+                data: null,
+                message: "No Vehicle Record Found for This User",
+                status: true
+            });
+        }
+
+        return res.send({
+            data: vehicle,
+            message: "Vehicle Fetched Successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'getVehicleByUserId', clientIp, clientId);
         res.status(500).json({ status: false, error: error.message });
     }
 };

@@ -100,6 +100,7 @@ router.post('/deleteContact', verifyToken, ContactController.deleteContact);
 router.post('/exportContacts', verifyToken, ContactController.exportContacts);
 
 router.post('/createVehicle', verifyToken, VehicleController.createVehicle);
+router.post('/getVehicleByUserId', verifyToken, VehicleController.getVehicleByUserId);
 router.post('/getVehicles', verifyToken, VehicleController.getVehicles);
 router.post('/getVehicleDetailsById', verifyToken, VehicleController.getVehicleDetailsById);
 router.post('/updateVehicle', verifyToken, VehicleController.updateVehicle);
