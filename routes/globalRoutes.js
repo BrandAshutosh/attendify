@@ -3,6 +3,7 @@ const verifyToken = require('../middlewares/verifyToken.js');
 const { upload } = require('../utils/uploadDocument.js');
 
 const StartController = require('../controllers/startController.js');
+const DocumentController = require('../controllers/documentController');
 const AuthorizationController = require('../controllers/authorizationController.js')
 const ExceptionController = require('../controllers/exceptionController.js');
 const UserController = require('../controllers/userController.js');
@@ -13,7 +14,8 @@ const HolidayController = require('../controllers/holidayController.js');
 const DeviceManagerController = require('../controllers/devicemanagerController.js');
 const ShiftController = require('../controllers/shiftController.js');
 const ContactController = require('../controllers/contactController.js');
-const DocumentController = require('../controllers/documentController');
+const VehicleController = require('../controllers/vehicleController.js');
+
 
 
 const router = express.Router();
@@ -96,5 +98,13 @@ router.post('/getContactById', verifyToken, ContactController.getContactById);
 router.post('/updateContact', verifyToken, ContactController.updateContact);
 router.post('/deleteContact', verifyToken, ContactController.deleteContact);        
 router.post('/exportContacts', verifyToken, ContactController.exportContacts);
+
+router.post('/createVehicle', verifyToken, VehicleController.createVehicle);
+router.post('/getVehicles', verifyToken, VehicleController.getVehicles);
+router.post('/getVehicleDetailsById', verifyToken, VehicleController.getVehicleDetailsById);
+router.post('/updateVehicle', verifyToken, VehicleController.updateVehicle);
+router.post('/deleteVehicle', verifyToken, VehicleController.deleteVehicle);
+router.post('/exportVehicles', verifyToken, VehicleController.exportVehicles);
+
 
 module.exports = router;
