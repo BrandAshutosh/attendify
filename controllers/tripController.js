@@ -21,7 +21,7 @@ exports.createTrip = async (req, res) => {
     const clientId = userData.memberData.clientId;
 
     try {
-        const { tripPoints, startTime, endTime } = req.body;
+        const { tripPoints, startTime, endTime, userId, isapplied } = req.body;
 
         if (!tripPoints || tripPoints.length === 0) {
             return res.status(400).json({
