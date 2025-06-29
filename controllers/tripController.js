@@ -31,11 +31,12 @@ exports.createTrip = async (req, res) => {
         }
 
         const trip = new TripModel({
-            userId: userData.memberData.userId,
+            userId,
             clientId,
             tripPoints,
             startTime,
             endTime,
+            isapplied,
             createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
             creatorIp: clientIp
         });
