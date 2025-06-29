@@ -5,7 +5,7 @@ const formatDate = require('../utils/dateFormattter');
 const tripSchema = new mongoose.Schema(
     {
         _id: { type: Number },
-        clientId: { type: Number },
+        clientId: { type: Number, required: true },
         userId: { type: Number, required: true, ref: 'userCollection' },
         tripPoints: [
             {

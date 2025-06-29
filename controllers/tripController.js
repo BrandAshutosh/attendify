@@ -3,12 +3,7 @@ const Exception = require('../models/exceptionModel');
 
 const logException = async (message, methodName, ipAddress, clientId) => {
     try {
-        const newException = new Exception({
-            message,
-            methodName,
-            ipAddress,
-            clientId
-        });
+        const newException = new Exception({ message, methodName, ipAddress, clientId });
         await newException.save();
     } catch (err) {
         console.log('Error logging exception:', err);
@@ -24,13 +19,10 @@ exports.createTrip = async (req, res) => {
         const { tripPoints, startTime, endTime, userId, isapplied } = req.body;
 
         if (!tripPoints || tripPoints.length === 0) {
-            return res.status(400).json({
-                status: false,
-                message: "Trip path data is required"
-            });
+            return res.status(400).json({ status: false, message: "Trip path data is required" });
         }
 
-        const trip = new TripModel({
+        const newTrip = new TripModel({
             userId,
             clientId,
             tripPoints,
@@ -41,10 +33,10 @@ exports.createTrip = async (req, res) => {
             creatorIp: clientIp
         });
 
-        await trip.save();
+        await newTrip.save();
 
         return res.send({
-            data: trip,
+            data: newTrip,
             message: "Trip saved successfully",
             status: true
         });
@@ -61,17 +53,17 @@ exports.getTrips = async (req, res) => {
     const clientId = userData.memberData.clientId;
 
     try {
-        let trips;
+        let tripList;
 
         if (clientId === parseInt(process.env.MASTER_CLIENT_ID)) {
-            trips = await TripModel.find().sort({ _id: -1 });
+            tripList = await TripModel.find().sort({ _id: -1 });
         } else {
-            trips = await TripModel.find({ clientId }).sort({ _id: -1 });
+            tripList = await TripModel.find({ clientId }).sort({ _id: -1 });
         }
 
         return res.send({
-            data: trips,
-            message: "Trips fetched successfully",
+            data: tripList,
+            message: tripList.length ? "Trips fetched successfully" : "No Trip Record Found",
             status: true
         });
 
@@ -87,24 +79,13 @@ exports.getTripById = async (req, res) => {
     const clientId = userData.memberData.clientId;
 
     try {
-        const trip = await TripModel.findOne({
-            _id: req.query.id,
-            clientId
-        });
+        const trip = await TripModel.findOne({ _id: req.query.id, clientId });
 
         if (!trip) {
-            return res.send({
-                data: [],
-                message: "No Record Found",
-                status: true
-            });
+            return res.send({ data: [], message: "No Record Found", status: true });
         }
 
-        return res.send({
-            data: trip,
-            message: "Trip fetched successfully",
-            status: true
-        });
+        return res.send({ data: trip, message: "Trip fetched successfully", status: true });
 
     } catch (error) {
         await logException(error.message, 'getTripById', clientIp, clientId);
@@ -128,17 +109,9 @@ exports.updateTrip = async (req, res) => {
         let trip;
 
         if (clientId === parseInt(process.env.MASTER_CLIENT_ID)) {
-            trip = await TripModel.findOneAndUpdate(
-                { _id: req.query.id },
-                updatedFields,
-                { new: true }
-            );
+            trip = await TripModel.findOneAndUpdate({ _id: req.query.id }, updatedFields, { new: true });
         } else {
-            trip = await TripModel.findOneAndUpdate(
-                { _id: req.query.id, clientId },
-                updatedFields,
-                { new: true }
-            );
+            trip = await TripModel.findOneAndUpdate({ _id: req.query.id, clientId }, updatedFields, { new: true });
         }
 
         if (!trip) {
@@ -168,7 +141,7 @@ exports.deleteTrip = async (req, res) => {
     const masterClientId = parseInt(process.env.MASTER_CLIENT_ID);
 
     try {
-        let ids = req.query.id.split(',').map(id => Number(id.trim()));
+        const ids = req.query.id.split(',').map(id => Number(id.trim()));
         let tripList;
 
         if (clientId === masterClientId) {
