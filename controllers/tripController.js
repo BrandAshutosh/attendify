@@ -324,8 +324,10 @@ exports.acceptTrip = async (req, res) => {
 
     try {
         const updateFields = {
+            isapplied: false,
             isapproved: true,
             isunapproved: false,
+            ispaid: false,
             updatedBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
             updatorIp: clientIp,
             clientId
@@ -364,8 +366,10 @@ exports.rejectTrip = async (req, res) => {
 
     try {
         const updateFields = {
+            isapplied: false,
             isapproved: false,
             isunapproved: true,
+            ispaid: false,
             updatedBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
             updatorIp: clientIp,
             clientId
@@ -395,4 +399,4 @@ exports.rejectTrip = async (req, res) => {
         await logException(error.message, 'rejectTrip', clientIp, clientId);
         res.status(500).json({ status: false, error: error.message });
     }
-};
+};                
