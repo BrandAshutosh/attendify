@@ -468,6 +468,40 @@ exports.createOnDuty = async (req, res) => {
     }
 };
 
+exports.getOnDuties = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+
+    try {
+        let OnDutyList;
+
+        if (clientId === parseInt(process.env.MASTER_CLIENT_ID)) {
+            OnDutyList = await OnDutyModel.find().sort({ _id: -1 });
+        } else {
+            OnDutyList = await OnDutyModel.find({ clientId: clientId }).sort({ _id: -1 });
+        }
+
+        if (OnDutyList.length === 0) {
+            return res.send({
+                data: [],
+                message: "No OnDuty Records Found",
+                status: true
+            });
+        }
+
+        return res.send({
+            data: OnDutyList,
+            message: "OnDuty Records Fetched Successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'getOnDuties', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
 exports.getOnDutyReports = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
