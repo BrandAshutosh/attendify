@@ -52,6 +52,23 @@ exports.getTrips = async (req, res) => {
     const clientIp = req.clientIp;
     const clientId = userData.memberData.clientId;
 
+    const haversineDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; 
+        const toRad = deg => (deg * Math.PI) / 180;
+
+        const φ1 = toRad(lat1);
+        const φ2 = toRad(lat2);
+        const Δφ = toRad(lat2 - lat1);
+        const Δλ = toRad(lon2 - lon1);
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+    };
+
     try {
         let tripList;
 
@@ -65,9 +82,26 @@ exports.getTrips = async (req, res) => {
                 .populate('userId', 'firstName lastName emailId mobile imageUrl');
         }
 
+        const processedTrips = tripList.map(trip => {
+            const points = trip.tripPoints || [];
+            let totalDistance = 0;
+
+            for (let i = 1; i < points.length; i++) {
+                const prev = points[i - 1];
+                const curr = points[i];
+                totalDistance += haversineDistance(prev.lat, prev.lng, curr.lat, curr.lng);
+            }
+
+            return {
+                ...trip.toObject(),
+                totalDistanceInMeters: Math.round(totalDistance),
+                totalDistanceInKilometers: (totalDistance / 1000).toFixed(2)
+            };
+        });
+
         return res.send({
-            data: tripList,
-            message: tripList.length ? "Trips fetched successfully" : "No Trip Record Found",
+            data: processedTrips,
+            message: processedTrips.length ? "Trips fetched successfully" : "No Trip Record Found",
             status: true
         });
 
