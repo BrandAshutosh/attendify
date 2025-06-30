@@ -63,7 +63,7 @@ router.post('/deleteLeave', verifyToken, LeaveController.deleteLeave);
 router.post('/exportLeave', verifyToken, LeaveController.exportLeave);
 router.post('/getLeaveBalanceReport', verifyToken, LeaveController.getLeaveBalanceReport);
 router.post('/createOnDuty', verifyToken, LeaveController.createOnDuty);
-router.post('/ggetOnDuties', verifyToken, OnDutyController.getOnDuties);
+router.post('/getOnDuties', verifyToken, OnDutyController.getOnDuties);
 router.post('/getOnDutyReports', verifyToken, LeaveController.getOnDutyReports);
 router.post('/onDutyDetailsById', verifyToken, LeaveController.onDutyDetailsById);
 
