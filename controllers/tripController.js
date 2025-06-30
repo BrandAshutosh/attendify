@@ -56,9 +56,13 @@ exports.getTrips = async (req, res) => {
         let tripList;
 
         if (clientId === parseInt(process.env.MASTER_CLIENT_ID)) {
-            tripList = await TripModel.find().sort({ _id: -1 });
+            tripList = await TripModel.find()
+                .sort({ _id: -1 })
+                .populate('userId', 'firstName lastName emailId mobile imageUrl');
         } else {
-            tripList = await TripModel.find({ clientId }).sort({ _id: -1 });
+            tripList = await TripModel.find({ clientId })
+                .sort({ _id: -1 })
+                .populate('userId', 'firstName lastName emailId mobile imageUrl');
         }
 
         return res.send({
