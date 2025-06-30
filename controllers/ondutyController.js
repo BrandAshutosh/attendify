@@ -214,6 +214,7 @@ exports.deleteOnDuty = async (req, res) => {
     }
 };
 
+
 exports.exportOnDuties = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
