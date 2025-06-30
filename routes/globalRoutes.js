@@ -110,6 +110,7 @@ router.post('/exportVehicles', verifyToken, VehicleController.exportVehicles);
 
 router.post('/createTrip', verifyToken, TripController.createTrip);
 router.post('/getTrips', verifyToken, TripController.getTrips);
+router.post('/getTripReports', verifyToken, TripController.getTripReports);
 router.post('/getTripById', verifyToken, TripController.getTripById);
 router.post('/updateTrip', verifyToken, TripController.updateTrip);
 router.post('/deleteTrip', verifyToken, TripController.deleteTrip);

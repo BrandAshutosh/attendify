@@ -73,6 +73,48 @@ exports.getTrips = async (req, res) => {
     }
 };
 
+exports.getTripReports = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+    const userId = req.query.userId ? parseInt(req.query.userId) : null;
+
+    try {
+        let filter = {};
+
+        if (clientId !== parseInt(process.env.MASTER_CLIENT_ID)) {
+            filter.clientId = clientId;
+        }
+
+        if (userId) {
+            filter.userId = userId;
+        }
+
+        const approvedCount = await TripModel.countDocuments({ ...filter, isapproved: 1 });
+        const unapprovedCount = await TripModel.countDocuments({ ...filter, isunapproved: 1 });
+        const appliedCount = await TripModel.countDocuments({ ...filter, isapplied: 1 });
+        const paidCount = await TripModel.countDocuments({ ...filter, ispaid: 1 });
+
+        const report = [
+            { approved: approvedCount },
+            { unapproved: unapprovedCount },
+            { applied: appliedCount },
+            { paid: paidCount }
+        ];
+
+        return res.send({
+            data: report,
+            message: "Trip Report Fetched Successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'getTripReports', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
+
 exports.getTripById = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
