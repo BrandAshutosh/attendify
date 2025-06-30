@@ -16,9 +16,10 @@ const documentationPath = path.join(__dirname, 'public/documentation');
 app.use(express.static(documentationPath));
 
 app.use(cors({
-    origin: '*',
+    origin: ['http://localhost:3000', 'https://your-production-frontend.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-forwarded-for']
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-forwarded-for'],
+    credentials: true
 }));
 
 app.use(express.json());
