@@ -115,6 +115,8 @@ router.post('/getTripReports', verifyToken, TripController.getTripReports);
 router.post('/getTripById', verifyToken, TripController.getTripById);
 router.post('/updateTrip', verifyToken, TripController.updateTrip);
 router.post('/deleteTrip', verifyToken, TripController.deleteTrip);
+router.post('/acceptTrip', verifyToken, TripController.acceptTrip);
+router.post('/rejectTrip', verifyToken, TripController.rejectTrip);
 
 
 module.exports = router;

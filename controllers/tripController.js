@@ -218,7 +218,6 @@ exports.getTripReports = async (req, res) => {
     }
 };
 
-
 exports.getTripById = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
@@ -314,6 +313,86 @@ exports.deleteTrip = async (req, res) => {
 
     } catch (error) {
         await logException(error.message, 'deleteTrip', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
+exports.acceptTrip = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+
+    try {
+        const updateFields = {
+            isapproved: true,
+            isunapproved: false,
+            updatedBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
+            updatorIp: clientIp,
+            clientId
+        };
+
+        const filter = clientId === parseInt(process.env.MASTER_CLIENT_ID)
+            ? { _id: req.query.id }
+            : { _id: req.query.id, clientId };
+
+        const trip = await TripModel.findOneAndUpdate(filter, updateFields, { new: true });
+
+        if (!trip) {
+            return res.send({
+                data: [],
+                message: "No Record Found To Approve",
+                status: true
+            });
+        }
+
+        return res.send({
+            data: trip,
+            message: "Trip approved successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'acceptTrip', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
+exports.rejectTrip = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+
+    try {
+        const updateFields = {
+            isapproved: false,
+            isunapproved: true,
+            updatedBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
+            updatorIp: clientIp,
+            clientId
+        };
+
+        const filter = clientId === parseInt(process.env.MASTER_CLIENT_ID)
+            ? { _id: req.query.id }
+            : { _id: req.query.id, clientId };
+
+        const trip = await TripModel.findOneAndUpdate(filter, updateFields, { new: true });
+
+        if (!trip) {
+            return res.send({
+                data: [],
+                message: "No Record Found To Reject",
+                status: true
+            });
+        }
+
+        return res.send({
+            data: trip,
+            message: "Trip rejected successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'rejectTrip', clientIp, clientId);
         res.status(500).json({ status: false, error: error.message });
     }
 };
