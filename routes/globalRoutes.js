@@ -16,6 +16,7 @@ const ShiftController = require('../controllers/shiftController.js');
 const ContactController = require('../controllers/contactController.js');
 const VehicleController = require('../controllers/vehicleController.js');
 const TripController = require('../controllers/tripController.js');
+const OnDutyController = require('../controllers/onDutyController.js');
 
 
 
@@ -62,6 +63,7 @@ router.post('/deleteLeave', verifyToken, LeaveController.deleteLeave);
 router.post('/exportLeave', verifyToken, LeaveController.exportLeave);
 router.post('/getLeaveBalanceReport', verifyToken, LeaveController.getLeaveBalanceReport);
 router.post('/createOnDuty', verifyToken, LeaveController.createOnDuty);
+router.post('/ggetOnDuties', verifyToken, OnDutyController.getOnDuties);
 router.post('/getOnDutyReports', verifyToken, LeaveController.getOnDutyReports);
 router.post('/onDutyDetailsById', verifyToken, LeaveController.onDutyDetailsById);
 
