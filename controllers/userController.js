@@ -6,6 +6,7 @@ const mailSender = require('../utils/mailSender');
 const excelFormatter = require('../templates/excelFormatter');
 const emailTemplate = require('../templates/emailTemplates');
 
+
 const logException = async (message, methodName, ipAddress, clientId) => {
     try {
         const newException = new Exception({
@@ -23,7 +24,7 @@ const logException = async (message, methodName, ipAddress, clientId) => {
 exports.createUser = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;
-    const clientId = userData.memberData.clientId;
+    const clientId = userData?.memberData?.clientId;
 
     try {
         const existingRecords = await UserModel.find({
@@ -60,9 +61,9 @@ exports.createUser = async (req, res) => {
 
         await savedUser.save();
 
-        const token = jwt.sign({ memberData: savedUser.toJSON() }, process.env.TOKEN_KEY, { expiresIn: '2d' });
+        const token = jwt.sign({ memberData: savedUser.toJSON() },process.env.TOKEN_KEY,{ expiresIn: '2d' });
 
-        return res.send({
+        return res.status(201).json({
             data: {
                 user: savedUser,
                 token
