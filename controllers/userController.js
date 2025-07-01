@@ -1,5 +1,7 @@
 const UserModel = require('../models/userModel');
 const Exception = require('../models/exceptionModel');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const mailSender = require('../utils/mailSender');
 const excelFormatter = require('../templates/excelFormatter');
 const emailTemplate = require('../templates/emailTemplates');
@@ -45,8 +47,12 @@ exports.createUser = async (req, res) => {
             });
         }
 
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
         const savedUser = new UserModel({
             ...req.body,
+            password: hashedPassword,
             creatorIp: clientIp,
             clientId: clientId,
             createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
@@ -54,8 +60,13 @@ exports.createUser = async (req, res) => {
 
         await savedUser.save();
 
+        const token = jwt.sign({ memberData: savedUser.toJSON() }, process.env.TOKEN_KEY, { expiresIn: '2d' });
+
         return res.send({
-            data: savedUser,
+            data: {
+                user: savedUser,
+                token
+            },
             message: "User Created Successfully",
             status: true
         });

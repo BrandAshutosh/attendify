@@ -7,6 +7,8 @@ const http = require('http');
 const cron = require('node-cron'); 
 
 const { processMonthlyLeave } = require('./controllers/leaveController');
+const { processMonthlySundays } = require('./controllers/leaveController');
+
 const globalRoutes = require('./routes/globalRoutes');
 
 const app = express();
@@ -49,7 +51,9 @@ app.use((err, req, res, next) => {
 cron.schedule('0 0 1 * *', () => {
     console.log('Running The Monthly Leave Update Process ...');
     processMonthlyLeave();
+    processMonthlySundays();
 });
+
 
 server.listen(process.env.PORT || 3000, () => {
     console.log(`App Is Running On Port : ${process.env.PORT || 3000}`);

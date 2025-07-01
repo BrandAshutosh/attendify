@@ -1,5 +1,6 @@
 const LeaveModel = require('../models/leaveModel');
 const LeaveBalanceModel = require('../models/leavebalanceModel');
+const AttendanceModel = require('../models/attendanceModel');
 const UserModel = require('../models/userModel');
 const OnDutyModel = require('../models/ondutyModel');
 const Exception = require('../models/exceptionModel');
@@ -437,6 +438,59 @@ exports.processMonthlyLeave = async (req, res) => {
                 error: error.message
             });
         }
+    }
+};
+
+const getAllSundays = (year, month) => {
+    const sundays = [];
+    const daysInMonth = new Date(year, month, 0).getDate(); 
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const date = new Date(year, month - 1, i); 
+        if (date.getDay() === 0) {
+            sundays.push(date.toISOString().slice(0, 10));
+        }
+    }
+
+    return sundays;
+};
+
+exports.processMonthlySundays = async () => {
+    try {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1; 
+
+        const sundays = getAllSundays(currentYear, currentMonth);
+        const users = await UserModel.find({ isActive: 1 });
+
+        for (const user of users) {
+            for (const sunday of sundays) {
+                const exists = await AttendanceModel.findOne({
+                    userId: user._id,
+                    date: sunday
+                });
+
+                if (!exists) {
+                    await AttendanceModel.create({
+                        clientId: user.clientId,
+                        userId: user._id,
+                        date: sunday,
+                        isHoliday: true,
+                        dayType: 'Holiday',
+                        notes: 'Sunday',
+                        createdBy: 'System',
+                        updatedBy: 'System',
+                        creatorIp: 'AUTO',
+                        updatorIp: 'AUTO'
+                    });
+                }
+            }
+        }
+
+        console.log('Sunday entries created for all users.');
+    } catch (error) {
+        console.error('Error in Sunday creation:', error.message);
     }
 };
 
