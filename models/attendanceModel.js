@@ -8,8 +8,8 @@ const attendanceSchema = new mongoose.Schema(
     clientId: { type: Number },
     userId: { type: Number, required: true, ref: 'userCollection' },
     date: { type: String },
-    loginTime: { type: String },
-    logoutTime: { type: String},
+    loginTime: { type: Date },
+    logoutTime: { type: Date },
     loginLocation: {
       latitude: { type: Number },
       longitude: { type: Number },
