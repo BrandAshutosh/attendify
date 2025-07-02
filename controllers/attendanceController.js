@@ -562,11 +562,16 @@ exports.presenceDetail = async (req, res) => {
             loginTime = formatToTimeString(attendance.loginTime);
             salaryDay = 1;
             status = "P";
-            isLogin = "Y";
         }
 
         if (attendance && attendance.logoutTime) {
             logoutTime = formatToTimeString(attendance.logoutTime);
+        }
+
+        if (!attendance || !attendance.logoutTime) {
+            isLogin = "Y";
+        } else {
+            isLogin = "N";
         }
 
         return res.send({
