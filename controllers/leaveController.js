@@ -478,6 +478,7 @@ exports.processMonthlySundays = async () => {
                         date: sunday,
                         isHoliday: true,
                         dayType: 'Holiday',
+                        flags:'S',
                         notes: 'Sunday',
                         createdBy: 'System',
                         updatedBy: 'System',

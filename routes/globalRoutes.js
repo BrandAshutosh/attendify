@@ -50,6 +50,7 @@ router.post('/getAttendanceById', verifyToken, AttendanceController.getAttendanc
 router.post('/updateAttendance', verifyToken, AttendanceController.updateAttendance);
 router.post('/deleteAttendance', verifyToken, AttendanceController.deleteAttendance);
 router.post('/exportAttendance', verifyToken, AttendanceController.exportAttendance);
+router.post('/getMonthlyAttendanceGrid', verifyToken, AttendanceController.getMonthlyAttendanceGrid);
 
 router.post('/createLeave', verifyToken, LeaveController.createLeave);
 router.post('/getLeaves', verifyToken, LeaveController.getLeaves);

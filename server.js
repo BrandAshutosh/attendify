@@ -54,7 +54,6 @@ cron.schedule('0 0 1 * *', () => {
     processMonthlySundays();
 });
 
-
 server.listen(process.env.PORT || 3000, () => {
     console.log(`App Is Running On Port : ${process.env.PORT || 3000}`);
 });

@@ -79,6 +79,65 @@ exports.getAttendances = async (req, res) => {
     }
 };
 
+exports.getMonthlyAttendanceGrid = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+
+    const { userId, month } = req.query;
+
+    try {
+        const [year, monthStr] = month.split("-");
+        const yearNum = parseInt(year);
+        const monthNum = parseInt(monthStr) - 1;
+
+        const startDate = new Date(yearNum, monthNum, 1);
+        const endDate = new Date(yearNum, monthNum + 1, 0);
+        const totalDays = endDate.getDate();
+
+        const start = startDate.toISOString().split("T")[0];
+        const end = endDate.toISOString().split("T")[0];
+
+        let attendances;
+        if (clientId === parseInt(process.env.MASTER_CLIENT_ID)) {
+            attendances = await AttendanceModel.find({
+                userId: parseInt(userId),
+                date: { $gte: start, $lte: end }
+            });
+        } else {
+            attendances = await AttendanceModel.find({
+                clientId: clientId,
+                userId: parseInt(userId),
+                date: { $gte: start, $lte: end }
+            });
+        }
+
+        const flagMap = {};
+        attendances.forEach(entry => {
+            flagMap[entry.date] = entry.flags || 'A';
+        });
+
+        const attendanceGrid = [];
+        for (let day = 1; day <= totalDays; day++) {
+            const date = new Date(yearNum, monthNum, day).toISOString().split("T")[0];
+            attendanceGrid.push({
+                day,
+                flag: flagMap[date] || 'A'
+            });
+        }
+
+        return res.send({
+            data: attendanceGrid,
+            message: "Monthly Attendance Grid Fetched",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'getMonthlyAttendanceGrid', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
 exports.getAttendanceById = async (req, res) => {
     const userData = req.user;
     const clientIp = req.clientIp;

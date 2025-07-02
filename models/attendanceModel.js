@@ -47,6 +47,8 @@ const attendanceSchema = new mongoose.Schema(
     isHoliday: { type: Boolean, default: false },
     isWorkingDay: { type: Boolean, default: true },
     totalHours: { type: Number, default: 0 },
+    overtimeHours: { type: Number, default: 0 },
+    flags: {type:String},
     notes: { type: String },
     createdBy: { type: String },
     updatedBy: { type: String },
