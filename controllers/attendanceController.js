@@ -5,7 +5,7 @@ const Exception = require('../models/exceptionModel');
 const mailSender = require('../utils/mailSender');
 const excelFormatter = require('../templates/excelFormatter');
 const emailTemplate = require('../templates/emailTemplates');
-const moment = require('moment'); 
+const moment = require('moment');
 
 const logException = async (message, methodName, ipAddress, clientId) => {
     try {
@@ -26,25 +26,60 @@ exports.createAttendance = async (req, res) => {
     const clientIp = req.clientIp;
     const clientId = userData.memberData.clientId;
 
+    const userId = userData.memberData._id;
+    const createdBy = `${userData.memberData.firstName} ${userData.memberData.lastName}`;
+    const date = req.body.date;
+
     try {
-        const savedUser = new AttendanceModel({
-            ...req.body,
-            creatorIp: clientIp,
-            clientId: clientId,
-            userId: userData.memberData._id,
-            createdBy: `${userData.memberData.firstName} ${userData.memberData.lastName}`,
-        });
+        const existingRecord = await AttendanceModel.findOne({ userId, date });
 
-        await savedUser.save();
-        return res.send({
-            data: savedUser,
-            message: "Attendance Created Successfully",
-            status: true
-        });
+        if (existingRecord) {
+            const updated = await AttendanceModel.findOneAndUpdate(
+                { _id: existingRecord._id },
+                {
+                    $set: {
+                        logoutTime: req.body.logoutTime || existingRecord.logoutTime,
+                        logoutLocation: req.body.logoutLocation || existingRecord.logoutLocation,
+                        logoutImageUrl: req.body.logoutImageUrl || existingRecord.logoutImageUrl,
+                        logoutDeviceInfo: req.body.logoutDeviceInfo || existingRecord.logoutDeviceInfo,
+                        'faceVerification.logoutVerified': req.body.faceVerification?.logoutVerified ?? existingRecord.faceVerification.logoutVerified,
+                        'faceVerification.logoutConfidence': req.body.faceVerification?.logoutConfidence ?? existingRecord.faceVerification.logoutConfidence,
+                        'faceVerification.failedReason': req.body.faceVerification?.failedReason ?? existingRecord.faceVerification.failedReason,
+                        flags: req.body.flags || existingRecord.flags,
+                        isEarlyLogout: req.body.isEarlyLogout ?? existingRecord.isEarlyLogout,
+                        overtimeHours: req.body.overtimeHours ?? existingRecord.overtimeHours,
+                        updatedBy: createdBy,
+                        updatorIp: clientIp
+                    }
+                },
+                { new: true }
+            );
 
+            return res.send({
+                data: updated,
+                message: "Logout updated successfully",
+                status: true
+            });
+        } else {
+            const savedUser = new AttendanceModel({
+                ...req.body,
+                creatorIp: clientIp,
+                clientId,
+                userId,
+                createdBy
+            });
+
+            await savedUser.save();
+
+            return res.send({
+                data: savedUser,
+                message: "Attendance Created Successfully",
+                status: true
+            });
+        }
     } catch (error) {
         await logException(error.message, 'createAttendance', clientIp, clientId);
-        res.status(500).json({ status: false, error: error.message });
+        return res.status(500).json({ status: false, error: error.message });
     }
 };
 
