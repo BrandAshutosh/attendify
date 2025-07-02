@@ -518,3 +518,71 @@ exports.shiftDetails = async (req, res) => {
         res.status(500).json({ status: false, error: error.message });
     }
 };
+
+exports.presenceDetail = async (req, res) => {
+    const userData = req.user;
+    const clientIp = req.clientIp;
+    const clientId = userData.memberData.clientId;
+
+    function formatToISO(dateStr) {
+        const [dd, mm, yyyy] = dateStr.split("-");
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function formatToTimeString(time) {
+        if (!time) return "00:00";
+        const date = new Date(time);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
+
+    try {
+        const userId = Number(req.query.userId);
+        const rawDate = req.query.date;
+        const formattedDate = rawDate ? formatToISO(rawDate) : null;
+
+        if (!userId || !formattedDate) {
+            return res.status(400).json({ status: false, message: "userId and date are required" });
+        }
+
+        const attendance = await AttendanceModel.findOne({
+            clientId: clientId,
+            userId: userId,
+            date: formattedDate
+        });
+
+        let loginTime = "00:00";
+        let logoutTime = "00:00";
+        let salaryDay = 0;
+        let status = "A";
+        let isLogin = "N";
+
+        if (attendance && attendance.loginTime) {
+            loginTime = formatToTimeString(attendance.loginTime);
+            salaryDay = 1;
+            status = "P";
+            isLogin = "Y";
+        }
+
+        if (attendance && attendance.logoutTime) {
+            logoutTime = formatToTimeString(attendance.logoutTime);
+        }
+
+        return res.send({
+            data: {
+                loginTime,
+                logoutTime,
+                salaryDay,
+                status,
+                isLogin
+            },
+            message: "Presence Details Fetched Successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'presenceDetail', clientIp, clientId);
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
