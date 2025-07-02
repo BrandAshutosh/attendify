@@ -1,6 +1,6 @@
 const AttendanceModel = require('../models/attendanceModel');
 const UserModel = require('../models/userModel');
-const Shiftmodel = require('../models/shiftModel');
+const ShiftModel = require('../models/shiftModel');
 const Exception = require('../models/exceptionModel');
 const mailSender = require('../utils/mailSender');
 const excelFormatter = require('../templates/excelFormatter');
@@ -333,43 +333,79 @@ exports.exportAttendance = async (req, res) => {
 };
 
 exports.shiftDetails = async (req, res) => {
+    const userData = req.user;
     const clientIp = req.clientIp;
-    const clientId = req.user?.memberData?.clientId;
-    const userId = parseInt(req.params.userId);
+    const clientId = userData.memberData.clientId;
+
+    function formatToISO(dateStr) {
+        const [dd, mm, yyyy] = dateStr.split("-");
+        return `${yyyy}-${mm}-${dd}`;
+    }
 
     try {
-        const user = await UserModel.findOne({ _id: userId });
+        const userId = Number(req.query.userId);
+        const rawDate = req.query.date;
+        const formattedDate = rawDate ? formatToISO(rawDate) : null;
 
-        if (!user) {
-            return res.status(404).json({
-                data: {},
-                message: "User not found",
-                status: false
+        const user = await UserModel.findOne({ _id: userId, clientId: clientId });
+        if (!user || !user.shift) {
+            return res.send({
+                data: [],
+                message: "User or Shift Not Found",
+                status: true
             });
         }
 
-        const shiftRecord = await ShiftModel.findOne({ shift: user.shift });
-
-        if (!shiftRecord) {
-            return res.status(404).json({
-                data: {},
-                message: "Shift record not found for this user",
-                status: false
+        const shift = await ShiftModel.findOne({ shift: user.shift, clientId: clientId });
+        if (!shift) {
+            return res.send({
+                data: [],
+                message: "No Shift Record Found",
+                status: true
             });
+        }
+
+        const present = [];
+        const absent = [];
+
+        if (formattedDate) {
+            const allUsers = await UserModel.find({ clientId: clientId });
+            const attendanceRecords = await AttendanceModel.find({ clientId: clientId, date: formattedDate });
+
+            const presentUserIds = attendanceRecords
+                .filter(record => record.flags === 'P')
+                .map(record => record.userId);
+
+            for (let u of allUsers) {
+                const uInfo = {
+                    id: u._id,
+                    name: `${u.firstName} ${u.lastName}`,
+                    designation: u.designation || '',
+                    department: u.department || ''
+                };
+
+                if (presentUserIds.includes(u._id)) {
+                    present.push(uInfo);
+                } else {
+                    absent.push(uInfo);
+                }
+            }
         }
 
         return res.send({
             data: {
-                shift: shiftRecord.shift,
-                startTime: shiftRecord.startTime,
-                endTime: shiftRecord.endTime
+                shift: shift.shift,
+                startTime: shift.startTime,
+                endTime: shift.endTime,
+                present: present,
+                absent: absent
             },
-            message: "Shift details fetched successfully",
+            message: "Shift Details Fetched Successfully",
             status: true
         });
 
     } catch (error) {
         await logException(error.message, 'shiftDetails', clientIp, clientId);
-        return res.status(500).json({ status: false, error: error.message });
+        res.status(500).json({ status: false, error: error.message });
     }
 };
