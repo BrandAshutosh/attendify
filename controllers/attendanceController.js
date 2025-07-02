@@ -126,7 +126,7 @@ exports.getMonthlyAttendanceGrid = async (req, res) => {
 
             attendanceGrid.push({
                 day,
-                flag: flagMap[isoDate] || 'A',
+                status: flagMap[isoDate] || 'A',
                 date: formattedDate
             });
         }
