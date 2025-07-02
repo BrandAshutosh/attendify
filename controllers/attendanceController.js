@@ -1,4 +1,6 @@
 const AttendanceModel = require('../models/attendanceModel');
+const UserModel = require('../models/userModel');
+const Shiftmodel = require('../models/shiftModel');
 const Exception = require('../models/exceptionModel');
 const mailSender = require('../utils/mailSender');
 const excelFormatter = require('../templates/excelFormatter');
@@ -327,5 +329,47 @@ exports.exportAttendance = async (req, res) => {
     } catch (error) {
         await logException(error.message, 'exportAttendance', clientIp, clientId);
         res.status(500).json({ status: false, error: error.message });
+    }
+};
+
+exports.shiftDetails = async (req, res) => {
+    const clientIp = req.clientIp;
+    const clientId = req.user?.memberData?.clientId;
+    const userId = parseInt(req.params.userId);
+
+    try {
+        const user = await UserModel.findOne({ _id: userId });
+
+        if (!user) {
+            return res.status(404).json({
+                data: {},
+                message: "User not found",
+                status: false
+            });
+        }
+
+        const shiftRecord = await ShiftModel.findOne({ shift: user.shift });
+
+        if (!shiftRecord) {
+            return res.status(404).json({
+                data: {},
+                message: "Shift record not found for this user",
+                status: false
+            });
+        }
+
+        return res.send({
+            data: {
+                shift: shiftRecord.shift,
+                startTime: shiftRecord.startTime,
+                endTime: shiftRecord.endTime
+            },
+            message: "Shift details fetched successfully",
+            status: true
+        });
+
+    } catch (error) {
+        await logException(error.message, 'shiftDetails', clientIp, clientId);
+        return res.status(500).json({ status: false, error: error.message });
     }
 };
