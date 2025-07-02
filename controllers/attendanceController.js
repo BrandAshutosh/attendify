@@ -438,7 +438,11 @@ exports.shiftDetails = async (req, res) => {
             );
 
             if (myRecord) {
-                isYou = true;
+                const hasLoginTime = !!myRecord.loginTime;
+                const hasLogoutTime = !!myRecord.logoutTime;
+
+                isYou = !(hasLoginTime && hasLogoutTime);
+
                 if (myRecord.loginImageUrl) {
                     face = "Y";
                 }
