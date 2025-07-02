@@ -33,33 +33,82 @@ exports.createAttendance = async (req, res) => {
     try {
         const existingRecord = await AttendanceModel.findOne({ userId, date });
 
-        if (existingRecord) {
-            const updated = await AttendanceModel.findOneAndUpdate(
-                { _id: existingRecord._id },
-                {
-                    $set: {
-                        logoutTime: req.body.logoutTime || existingRecord.logoutTime,
-                        logoutLocation: req.body.logoutLocation || existingRecord.logoutLocation,
-                        logoutImageUrl: req.body.logoutImageUrl || existingRecord.logoutImageUrl,
-                        logoutDeviceInfo: req.body.logoutDeviceInfo || existingRecord.logoutDeviceInfo,
-                        'faceVerification.logoutVerified': req.body.faceVerification?.logoutVerified ?? existingRecord.faceVerification.logoutVerified,
-                        'faceVerification.logoutConfidence': req.body.faceVerification?.logoutConfidence ?? existingRecord.faceVerification.logoutConfidence,
-                        'faceVerification.failedReason': req.body.faceVerification?.failedReason ?? existingRecord.faceVerification.failedReason,
-                        flags: req.body.flags || existingRecord.flags,
-                        isEarlyLogout: req.body.isEarlyLogout ?? existingRecord.isEarlyLogout,
-                        overtimeHours: req.body.overtimeHours ?? existingRecord.overtimeHours,
-                        updatedBy: createdBy,
-                        updatorIp: clientIp
-                    }
-                },
-                { new: true }
-            );
+       if (existingRecord) {
+            const isLoginRequest = !req.body.logoutTime;
 
-            return res.send({
-                data: updated,
-                message: "Logout updated successfully",
-                status: true
-            });
+            if (isLoginRequest) {
+                const updated = await AttendanceModel.findOneAndUpdate(
+                    { _id: existingRecord._id },
+                    {
+                        $set: {
+                            loginTime: req.body.loginTime || existingRecord.loginTime,
+                            loginLocation: req.body.loginLocation || existingRecord.loginLocation,
+                            loginImageUrl: req.body.loginImageUrl || existingRecord.loginImageUrl,
+                            loginDeviceInfo: req.body.loginDeviceInfo || existingRecord.loginDeviceInfo,
+                            'faceVerification.loginVerified': req.body.faceVerification?.loginVerified ?? existingRecord.faceVerification.loginVerified,
+                            'faceVerification.loginConfidence': req.body.faceVerification?.loginConfidence ?? existingRecord.faceVerification.loginConfidence,
+
+                            logoutTime: null,
+                            logoutLocation: {
+                                latitude: null,
+                                longitude: null,
+                                address: ''
+                            },
+                            logoutImageUrl: '',
+                            logoutDeviceInfo: {
+                                deviceId: '',
+                                os: '',
+                                browser: '',
+                                ip: ''
+                            },
+                            'faceVerification.logoutVerified': false,
+                            'faceVerification.logoutConfidence': 0,
+                            'faceVerification.failedReason': '',
+
+                            flags: 'P',
+                            isEarlyLogout: false,
+                            updatedBy: createdBy,
+                            updatorIp: clientIp
+                        }
+                    },
+                    { new: true }
+                );
+
+                return res.send({
+                    data: updated,
+                    message: "Re-login: Logout info cleared successfully",
+                    status: true
+                });
+
+            } else {
+                const updated = await AttendanceModel.findOneAndUpdate(
+                    { _id: existingRecord._id },
+                    {
+                        $set: {
+                            logoutTime: req.body.logoutTime || existingRecord.logoutTime,
+                            logoutLocation: req.body.logoutLocation || existingRecord.logoutLocation,
+                            logoutImageUrl: req.body.logoutImageUrl || existingRecord.logoutImageUrl,
+                            logoutDeviceInfo: req.body.logoutDeviceInfo || existingRecord.logoutDeviceInfo,
+                            'faceVerification.logoutVerified': req.body.faceVerification?.logoutVerified ?? existingRecord.faceVerification.logoutVerified,
+                            'faceVerification.logoutConfidence': req.body.faceVerification?.logoutConfidence ?? existingRecord.faceVerification.logoutConfidence,
+                            'faceVerification.failedReason': req.body.faceVerification?.failedReason ?? existingRecord.faceVerification.failedReason,
+                            flags: req.body.flags || existingRecord.flags,
+                            isEarlyLogout: req.body.isEarlyLogout ?? existingRecord.isEarlyLogout,
+                            overtimeHours: req.body.overtimeHours ?? existingRecord.overtimeHours,
+                            updatedBy: createdBy,
+                            updatorIp: clientIp
+                        }
+                    },
+                    { new: true }
+                );
+
+                return res.send({
+                    data: updated,
+                    message: "Logout updated successfully",
+                    status: true
+                });
+            }
+
         } else {
             const savedUser = new AttendanceModel({
                 ...req.body,
@@ -77,6 +126,7 @@ exports.createAttendance = async (req, res) => {
                 status: true
             });
         }
+
     } catch (error) {
         await logException(error.message, 'createAttendance', clientIp, clientId);
         return res.status(500).json({ status: false, error: error.message });
