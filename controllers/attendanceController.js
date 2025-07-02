@@ -3,6 +3,7 @@ const Exception = require('../models/exceptionModel');
 const mailSender = require('../utils/mailSender');
 const excelFormatter = require('../templates/excelFormatter');
 const emailTemplate = require('../templates/emailTemplates');
+const moment = require('moment'); 
 
 const logException = async (message, methodName, ipAddress, clientId) => {
     try {
@@ -119,10 +120,14 @@ exports.getMonthlyAttendanceGrid = async (req, res) => {
 
         const attendanceGrid = [];
         for (let day = 1; day <= totalDays; day++) {
-            const date = new Date(yearNum, monthNum, day).toISOString().split("T")[0];
+            const dateObj = new Date(yearNum, monthNum, day);
+            const isoDate = dateObj.toISOString().split("T")[0];
+            const formattedDate = moment(dateObj).format("DD-MMM-YYYY");
+
             attendanceGrid.push({
                 day,
-                flag: flagMap[date] || 'A'
+                flag: flagMap[isoDate] || 'A',
+                date: formattedDate
             });
         }
 
