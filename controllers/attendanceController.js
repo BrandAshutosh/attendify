@@ -368,9 +368,15 @@ exports.shiftDetails = async (req, res) => {
         const present = [];
         const absent = [];
 
+        let isYou = false;
+        let face = "N";
+
         if (formattedDate) {
             const allUsers = await UserModel.find({ clientId: clientId });
-            const attendanceRecords = await AttendanceModel.find({ clientId: clientId, date: formattedDate });
+            const attendanceRecords = await AttendanceModel.find({
+                clientId: clientId,
+                date: formattedDate
+            });
 
             const presentUserIds = attendanceRecords
                 .filter(record => record.flags === 'P')
@@ -390,6 +396,17 @@ exports.shiftDetails = async (req, res) => {
                     absent.push(uInfo);
                 }
             }
+
+            const myRecord = attendanceRecords.find(
+                record => record.userId === userId && record.flags === 'P'
+            );
+
+            if (myRecord) {
+                isYou = true;
+                if (myRecord.loginImageUrl) {
+                    face = "Y";
+                }
+            }
         }
 
         return res.send({
@@ -397,8 +414,10 @@ exports.shiftDetails = async (req, res) => {
                 shift: shift.shift,
                 startTime: shift.startTime,
                 endTime: shift.endTime,
-                present: present,
-                absent: absent
+                present,
+                absent,
+                isYou,
+                face
             },
             message: "Shift Details Fetched Successfully",
             status: true
