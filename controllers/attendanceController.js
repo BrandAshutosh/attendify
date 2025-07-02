@@ -387,7 +387,8 @@ exports.shiftDetails = async (req, res) => {
                     id: u._id,
                     name: `${u.firstName} ${u.lastName}`,
                     designation: u.designation || '',
-                    department: u.department || ''
+                    department: u.department || '',
+                    imgUrl: u.imageUrl || '',
                 };
 
                 if (presentUserIds.includes(u._id)) {
