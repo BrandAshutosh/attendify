@@ -6,7 +6,6 @@ const shiftSchema = new mongoose.Schema(
     {
         _id: { type: Number },
         clientId: { type: Number },
-        userId: { type: Number, required: true, ref: 'userCollection' },
         shift: { type: String },
         startTime: { type: String },
         endTime: { type: String },
