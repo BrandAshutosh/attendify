@@ -151,6 +151,11 @@ exports.updateUser = async (req, res) => {
             clientId: clientId
         };
 
+        if (updatedFields.password) {
+            const salt = await bcrypt.genSalt(10);
+            updatedFields.password = await bcrypt.hash(updatedFields.password, salt);
+        }
+
         let Userlist;
 
         if (clientId === parseInt(process.env.MASTER_CLIENT_ID)) {
