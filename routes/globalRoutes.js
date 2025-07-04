@@ -43,6 +43,7 @@ router.post('/updateUser', verifyToken, UserController.updateUser);
 router.post('/deleteUser', verifyToken, UserController.deleteUser);
 router.post('/exportUserlist', verifyToken, UserController.exportUserlist);
 router.post('/getManagers', verifyToken, UserController.getManagers);
+router.post('/getDashboardStats', verifyToken, UserController.getDashboardStats);
 
 router.post('/createAttendance', verifyToken, AttendanceController.createAttendance);
 router.post('/getAttendances', verifyToken, AttendanceController.getAttendances);

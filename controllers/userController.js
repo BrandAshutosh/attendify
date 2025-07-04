@@ -1,4 +1,8 @@
 const UserModel = require('../models/userModel');
+const ShiftModel = require('../models/shiftModel');
+const LeaveModel = require('../models/leaveModel');
+const TripModel = require('../models/tripModel');
+const AttendanceModel = require('../models/attendanceModel');
 const Exception = require('../models/exceptionModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -349,4 +353,71 @@ exports.getManagers = async (req, res) => {
         await logException(error.message, 'getManagers', clientIp, clientId);
         res.status(500).json({ status: false, error: error.message });
     }
+};
+
+
+exports.getDashboardStats = async (req, res) => {
+  const userData = req.user;
+  const clientIp = req.clientIp;
+  const clientId = userData.memberData.clientId;
+
+  try {
+    let totaluser = 0;
+    let totalshift = 0;
+    let totalleave = 0;
+    let totaltrip = 0;
+    let users = [];
+    let attendancePie = [];
+
+    const isMasterClient = clientId === parseInt(process.env.MASTER_CLIENT_ID);
+    const filter = isMasterClient ? {} : { clientId: clientId };
+
+    totaluser = await UserModel.countDocuments(filter);
+    totalshift = await ShiftModel.countDocuments(filter);
+    totalleave = await LeaveModel.countDocuments(filter);
+    totaltrip = await TripModel.countDocuments(filter);
+
+    users = await UserModel.find(filter)
+      .sort({ _id: -1 })
+      .limit(5)
+      .select("firstName middleName lastName emailId mobile designation")
+      .lean();
+
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    const todayDate = `${day}-${month}-${year}`;
+
+    const attendanceFilter = { ...filter, date: todayDate };
+    const attendanceRecords = await AttendanceModel.find(attendanceFilter).lean();
+
+    const present = attendanceRecords.length;
+    const late = attendanceRecords.filter(a => a.isLate).length;
+    const onLeave = attendanceRecords.filter(a => a.isOnLeave).length;
+    const holiday = attendanceRecords.filter(a => a.isHoliday).length;
+    const absent = totaluser - present;
+
+    attendancePie = [
+      { name: 'Present', value: present },
+      { name: 'Absent', value: absent },
+      { name: 'Late', value: late },
+      { name: 'On Leave', value: onLeave },
+      { name: 'Holiday', value: holiday }
+    ];
+
+    return res.send({
+      totaluser,
+      totalshift,
+      totalleave,
+      totaltrip,
+      users,
+      attendance: attendancePie,
+      status: true,
+      message: "Dashboard stats fetched successfully"
+    });
+  } catch (error) {
+    await logException(error.message, 'getDashboardStats', clientIp, clientId);
+    res.status(500).json({ status: false, error: error.message });
+  }
 };
