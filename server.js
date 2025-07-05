@@ -28,16 +28,16 @@ app.use(express.json());
 
 app.use('/api/v1/', globalRoutes);
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(websitePath, 'index.html'));
-});
-
 mongoose.connect(process.env.MONGODB)
     .then(() => console.log('Successfully Connected To DataBase ...'))
     .catch((error) => {
         console.error('DataBase Connection Failed ...', error.message);
         process.exit(1);
     });
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(websitePath, 'index.html'));
+});
 
 app.use((err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
