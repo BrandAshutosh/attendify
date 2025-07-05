@@ -14,11 +14,11 @@ const globalRoutes = require('./routes/globalRoutes');
 const app = express();
 const server = http.createServer(app);
 
-const documentationPath = path.join(__dirname, 'public/documentation');
-app.use(express.static(documentationPath));
+const websitePath = path.join(__dirname, 'public/website');
+app.use(express.static(websitePath));
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://your-production-frontend.com'],
+    origin: ['http://localhost:3000', 'https://attendify-hnxj.onrender.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-forwarded-for'],
     credentials: true
@@ -29,7 +29,7 @@ app.use(express.json());
 app.use('/api/v1/', globalRoutes);
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(documentationPath, 'index.html'));
+    res.sendFile(path.join(websitePath, 'index.html'));
 });
 
 mongoose.connect(process.env.MONGODB)
